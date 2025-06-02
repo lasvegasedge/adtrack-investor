@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Users Management - AdTrack Investor Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Users Management</li>
+                </ol>
+            </nav>
+            
+            <h1>Users Management</h1>
+            <p class="lead">Approve new users and manage access levels for the AdTrack Investor Portal.</p>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="userTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending Approval</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-controls="active" aria-selected="false">Active Users</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="inactive-tab" data-bs-toggle="tab" data-bs-target="#inactive" type="button" role="tab" aria-controls="inactive" aria-selected="false">Inactive Users</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="userTabsContent">
+                        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Company</th>
+                                            <th>Position</th>
+                                            <th>Registered</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                            {% if user.email_confirmed and not user.is_approved %}
+                                                <tr>
+                                                    <td>{{ user.name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.company }}</td>
+                                                    <td>{{ user.position }}</td>
+                                                    <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <form method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}" class="d-inline">
+                                                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                                            </form>
+                                                            <form method="POST" action="{{ url_for('admin.reject_user', user_id=user.id) }}" class="d-inline ms-1">
+                                                                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="6" class="text-center">No pending users</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="active" role="tabpanel" aria-labelledby="active-tab">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Company</th>
+                                            <th>Role</th>
+                                            <th>Last Login</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                            {% if user.is_active and user.is_approved %}
+                                                <tr>
+                                                    <td>{{ user.name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.company }}</td>
+                                                    <td>
+                                                        <span class="role-badge role-{{ user.role }}">{{ user.role }}</span>
+                                                    </td>
+                                                    <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="roleDropdown{{ user.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Change Role
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="roleDropdown{{ user.id }}">
+                                                                <li>
+                                                                    <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}">
+                                                                        <input type="hidden" name="role" value="admin">
+                                                                        <button type="submit" class="dropdown-item">Admin</button>
+                                                                    </form>
+                                                                </li>
+                                                                <li>
+                                                                    <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}">
+                                                                        <input type="hidden" name="role" value="tier1">
+                                                                        <button type="submit" class="dropdown-item">Tier 1 Investor</button>
+                                                                    </form>
+                                                                </li>
+                                                                <li>
+                                                                    <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}">
+                                                                        <input type="hidden" name="role" value="tier2">
+                                                                        <button type="submit" class="dropdown-item">Tier 2 Investor</button>
+                                                                    </form>
+                                                                </li>
+                                                                <li>
+                                                                    <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}">
+                                                                        <input type="hidden" name="role" value="prospective">
+                                                                        <button type="submit" class="dropdown-item">Prospective Investor</button>
+                                                                    </form>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <form method="POST" action="{{ url_for('admin.reject_user', user_id=user.id) }}" class="d-inline mt-1">
+                                                            <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="6" class="text-center">No active users</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="inactive" role="tabpanel" aria-labelledby="inactive-tab">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Company</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                            {% if not user.is_active or (user.email_confirmed and not user.is_approved) %}
+                                                <tr>
+                                                    <td>{{ user.name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.company }}</td>
+                                                    <td>
+                                                        {% if not user.email_confirmed %}
+                                                            <span class="badge bg-warning">Email Not Verified</span>
+                                                        {% elif not user.is_approved %}
+                                                            <span class="badge bg-info">Rejected</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">Deactivated</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <form method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}">
+                                                            <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No inactive users</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
