@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - AdTrack Investor Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Admin Dashboard</h1>
+            <p class="lead">Manage users, track analytics, and control access to the AdTrack Investor Portal.</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card analytics-card">
+                <div class="card-header">
+                    User Management
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="stat-value">{{ pending_users }}</div>
+                            <div class="stat-label">Pending Approvals</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-value">{{ active_users }}</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">Manage Users</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card analytics-card">
+                <div class="card-header">
+                    Analytics Overview
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="stat-value">{{ total_users }}</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-value">{{ page_views|length }}</div>
+                            <div class="stat-label">Tracked Pages</div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ url_for('admin.analytics') }}" class="btn btn-primary">View Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Recent Activity
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Page</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in recent_activity %}
+                                <tr>
+                                    <td>{{ activity.user.email }}</td>
+                                    <td>{{ activity.page_url }}</td>
+                                    <td>{{ activity.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No recent activity</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
