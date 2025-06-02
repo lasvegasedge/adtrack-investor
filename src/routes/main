@@ -1,0 +1,112 @@
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask_login import login_required, current_user
+from functools import wraps
+
+main_bp = Blueprint('main', __name__)
+
+# Role-based access control decorator
+def role_required(required_roles):
+    def decorator(f):
+        @wraps(f)
+        @login_required
+        def decorated_function(*args, **kwargs):
+            if current_user.role not in required_roles:
+                abort(403)  # Forbidden
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+@main_bp.route('/')
+def index():
+    return render_template('main/index.html')
+
+@main_bp.route('/overview')
+@login_required
+def overview():
+    return render_template('main/overview.html')
+
+@main_bp.route('/problem-solution')
+@login_required
+def problem_solution():
+    return render_template('main/problem_solution.html')
+
+@main_bp.route('/technology')
+@login_required
+def technology():
+    return render_template('main/technology.html')
+
+@main_bp.route('/technology/deep-dive')
+@role_required(['admin', 'tier1', 'tier2'])
+def technology_deep_dive():
+    return render_template('main/technology_deep_dive.html')
+
+@main_bp.route('/market')
+@login_required
+def market():
+    return render_template('main/market.html')
+
+@main_bp.route('/market/analysis')
+@role_required(['admin', 'tier1', 'tier2'])
+def market_analysis():
+    return render_template('main/market_analysis.html')
+
+@main_bp.route('/business-model')
+@login_required
+def business_model():
+    return render_template('main/business_model.html')
+
+@main_bp.route('/financials')
+@role_required(['admin', 'tier1'])
+def financials():
+    return render_template('main/financials.html')
+
+@main_bp.route('/traction')
+@login_required
+def traction():
+    return render_template('main/traction.html')
+
+@main_bp.route('/marketing-assets')
+@login_required
+def marketing_assets():
+    return render_template('main/marketing_assets.html')
+
+@main_bp.route('/marketing-assets/<asset_type>')
+@login_required
+def marketing_asset_detail(asset_type):
+    valid_assets = [
+        'email-template', 
+        'quick-start-guide', 
+        'feature-comparison', 
+        'success-story', 
+        'elevator-pitch',
+        'social-media-calendar', 
+        'demo-script', 
+        'faq', 
+        'roi-calculator', 
+        'press-release'
+    ]
+    
+    if asset_type not in valid_assets:
+        abort(404)
+        
+    return render_template(f'main/marketing_assets/{asset_type}.html')
+
+@main_bp.route('/team')
+@login_required
+def team():
+    return render_template('main/team.html')
+
+@main_bp.route('/investment')
+@role_required(['admin', 'tier1'])
+def investment():
+    return render_template('main/investment.html')
+
+@main_bp.route('/faq')
+@login_required
+def faq():
+    return render_template('main/faq.html')
+
+@main_bp.route('/agreement')
+@login_required
+def agreement():
+    return render_template('main/agreement.html')
