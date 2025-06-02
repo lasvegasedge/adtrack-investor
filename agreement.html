@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}User Agreement - AdTrack Investor Portal{% endblock %}
+
+{% block content %}
+<div class="container agreement-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">AdTrack Investor Presentation Agreement</h2>
+            
+            <div class="alert alert-info">
+                <p>Please read and accept this agreement to proceed to the AdTrack investor presentation website.</p>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4>Confidentiality and Usage Agreement</h4>
+                    
+                    <p>This agreement ("Agreement") is entered into between you ("Recipient") and AdTrack ("Company") regarding access to confidential information through the AdTrack Investor Portal.</p>
+                    
+                    <h5>1. Confidential Information</h5>
+                    <p>All information presented on this website, including but not limited to business plans, financial projections, marketing strategies, technical specifications, and proprietary methodologies, is considered confidential information ("Confidential Information").</p>
+                    
+                    <h5>2. Non-Disclosure</h5>
+                    <p>Recipient agrees to maintain the confidentiality of all Confidential Information and not to disclose it to any third party without prior written consent from the Company.</p>
+                    
+                    <h5>3. Usage Restrictions</h5>
+                    <p>Recipient agrees not to print, save, download, or reproduce any content from this website other than materials explicitly provided by AdTrack for download purposes.</p>
+                    
+                    <h5>4. Investment Disclaimer</h5>
+                    <p>The information provided is for evaluation purposes only and does not constitute an offer to sell or solicitation of an offer to buy any securities.</p>
+                    
+                    <h5>5. Monitoring</h5>
+                    <p>Recipient acknowledges that their activity on this website may be tracked and monitored for security purposes.</p>
+                    
+                    <h5>6. Termination</h5>
+                    <p>The Company reserves the right to terminate access to the Confidential Information at any time and for any reason.</p>
+                </div>
+            </div>
+            
+            <form method="POST" action="{{ url_for('auth.agreement') }}">
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="accept" name="accept" required>
+                    <label class="form-check-label" for="accept">
+                        I have read and agree to the terms of this Agreement.
+                    </label>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Accept and Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
